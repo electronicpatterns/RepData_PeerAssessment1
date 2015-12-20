@@ -8,20 +8,26 @@ output:
 
 ## Loading and preprocessing the data
 
-```{r LoadandPrep, echo=TRUE, warning=FALSE}
 
+```r
 library(dplyr) # load dplyr to use its goodness.
 
 activity.data <- read.csv("activity.csv")
 
 str(activity.data) # brief overview of the dataset.
+```
 
+```
+## 'data.frame':	17568 obs. of  3 variables:
+##  $ steps   : int  NA NA NA NA NA NA NA NA NA NA ...
+##  $ date    : Factor w/ 61 levels "2012-10-01","2012-10-02",..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ interval: int  0 5 10 15 20 25 30 35 40 45 ...
 ```
 
 ## What is mean total number of steps taken per day?
 
-```{r Question1_Section1, echo=TRUE, warning=FALSE}
 
+```r
 # Section 1:
 
 total.steps.per.day <- activity.data %>%
@@ -34,25 +40,25 @@ with(total.steps.per.day,
              col = "red",
              main = "Histogram of daily steps",
              xlab = "Total steps per day"))
-
 ```
 
-```{r Question1_Section2, echo=TRUE, warning=FALSE}
+![plot of chunk Question1_Section1](figure/Question1_Section1-1.png) 
 
+
+```r
 # Section 2:
 
 # Find median and mean of the total steps per day.
 stats.median <- median(total.steps.per.day$total.steps)
 stats.mean <- mean(total.steps.per.day$total.steps)
-
 ```
 
-The total steps per day mean is **`r as.integer(stats.mean)`** and the median is **`r as.integer(stats.median)`**.
+The total steps per day mean is **10766** and the median is **10765**.
 
 ## What is the average daily activity pattern?
 
-```{r Question2_Section1, echo=TRUE, warning=FALSE}
 
+```r
 # Section 1:
 
 avg.steps.per.interval <- activity.data %>%
@@ -69,26 +75,26 @@ with(avg.steps.per.interval,
              main = "Avg daily activity pattern time series", 
              xlab="5-minutes interval", 
              ylab="Avg steps"))
-
 ```
 
-```{r Question2_Section2, echo=TRUE, warning=FALSE}
+![plot of chunk Question2_Section1](figure/Question2_Section1-1.png) 
 
+
+```r
 # Section 2:
 
 # Find the max value, its index, and the inverval corresponding to the max value.
 max.value <- max(avg.steps.per.interval$avg.steps)
 max.value.index <- which.max(avg.steps.per.interval$avg.steps)
 max.value.interval <- avg.steps.per.interval[max.value.index,][[1]]
-
 ```
 
-The maximum average number of step in the time series is **`r format(max.value, scientific=FALSE)`** for the interval **`r max.value.interval`**.
+The maximum average number of step in the time series is **206.1698** for the interval **835**.
 
 ## Imputing missing values
 
-```{r Question3_Section1, echo=TRUE, warning=FALSE}
 
+```r
 # Section 1:
 
 # Compute the number of rows containing NA values.
@@ -98,13 +104,12 @@ The maximum average number of step in the time series is **`r format(max.value, 
 # sum to compute the number we want because sum treats TRUE as 1 and FALSE as 0.
 # So all the TRUEs corresponding to NAs get summed up and give us what we want.
 count.NA.rows <- sum(is.na(activity.data$steps))
-
 ```
 
-The count of rows containing NAs is **`r count.NA.rows`**.
+The count of rows containing NAs is **2304**.
 
-```{r Question3_Section2, echo=TRUE, warning=FALSE}
 
+```r
 # Section 2:
 
 # The strategy I chose for imputing missing values is to use the 5-minute interval mean
@@ -129,9 +134,9 @@ imputed_value <- function(steps_arg, interval_arg) {
               }
 
 }
+```
 
-```{r Question3_Section3, echo=TRUE, warning=FALSE}
-
+```r
 # Section 3:
 
 # Construct a new data frame that extends the activity.data data frame with imputed values for
@@ -147,8 +152,8 @@ extended.activity.data <- activity.data %>%
                           rename(steps = imputed.steps)
 ```
 
-```{r Question3_Section4, echo=TRUE, warning=FALSE}
 
+```r
 # Section 4:
 
 # Using the extended data set, we construct average total steps per interval for all days.
@@ -161,21 +166,24 @@ with(extended.total.steps.per.day,
              col = "red",
              main = "Histogram of daily steps using extended dataset",
              xlab = "Total steps per day"))
+```
 
+![plot of chunk Question3_Section4](figure/Question3_Section4-1.png) 
+
+```r
 # Find median and mean of the total steps per day using the extended dataaset.
 extended.stats.median <- median(extended.total.steps.per.day$total.steps)
 extended.stats.mean <- mean(extended.total.steps.per.day$total.steps)
-
 ```
 
-The mean of the total steps per day for the extended set is **`r as.integer(extended.stats.mean)`** and the median is **`r as.integer(extended.stats.median)`**.
+The mean of the total steps per day for the extended set is **10765** and the median is **10762**.
 
 Based on the computed values, we conclude that the impact of the imputed values is minimal and does not affect the original histogram and the mean/median values by much.
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
-```{r Question4_Section1, echo=TRUE, warning=FALSE}
 
+```r
 # Section 1:
 
 # load the chron library so can use the is.weekend function which works very well for our purpose.
@@ -185,11 +193,10 @@ library(chron)
 extended.activity.data$date.type <- factor(ifelse(is.weekend(extended.activity.data$date), 
                                                   "weekend", 
                                                   "weekday"))
-
 ```
 
-```{r Question4_Section2, echo=TRUE, warning=FALSE}
 
+```r
 # Section 2:
 
 avg.steps.per.interval.weekend <- extended.activity.data %>%
@@ -218,5 +225,6 @@ with(avg.steps.per.interval.weekday,
              main="Avg steps per interval for weekday dates",
              xlab="5-minute interval",
              ylab="Avg steps"))
-
 ```
+
+![plot of chunk Question4_Section2](figure/Question4_Section2-1.png) 
